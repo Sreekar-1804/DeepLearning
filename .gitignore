@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+deeplearning/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Dataset folders
+train/
+test/
+
+# Raw CSV files
+train.csv
+test.csv
+
+# Cleaned CSVs - optional, keep ignored if dataset-dependent
+train_clean.csv
+val_clean.csv
+test_clean.csv
+
+# Outputs
+outputs/reports/*.csv
+
+# Large model files
+*.pth
+*.pt
+*.ckpt
+
+# Cache
+.cache/
