@@ -280,3 +280,8 @@ face_dataset/
 ├── train_clean.csv
 ├── val_clean.csv
 └── test_clean.csv
+
+## Author
+### Naga Sai Satya Sreekar Vanka
+LinkedIn: www.linkedin.com/in/sreekar-v/
+GitHub: https://github.com/Sreekar-1804
