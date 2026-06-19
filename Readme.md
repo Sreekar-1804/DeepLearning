@@ -1,287 +1,337 @@
-# Explainable Age and Gender Prediction using Deep Learning
+# Deep Learning Age & Gender Prediction
 
-This project is an end-to-end deep learning application for predicting **gender** and **age group** from face images using a **multi-task ResNet34 model**. The project includes data preprocessing, transfer learning, model evaluation, prediction confidence scores, Grad-CAM explainability, and a Streamlit web demo.
+## Multitask ResNet34 Image Classification System
 
-The goal of this project is not only to classify facial attributes, but also to make the model more interpretable using Grad-CAM visualizations.
+<p align="center">
+  <img src="https://img.shields.io/badge/PyTorch-Deep_Learning-red?style=for-the-badge&logo=pytorch&logoColor=white" />
+  <img src="https://img.shields.io/badge/ResNet34-CNN-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Transfer_Learning-Model_Training-green?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/GradCAM-Explainable_AI-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Streamlit-Demo_App-red?style=for-the-badge&logo=streamlit&logoColor=white" />
+</p>
 
 ---
 
 ## Project Overview
 
-The model predicts two outputs from a single face image:
+This project is a deep learning image classification system that predicts:
 
-1. **Gender Prediction**
-   - Female
-   - Male
+* Gender
+* Age group
 
-2. **Age Group Prediction**
-   - Child
-   - Young Adult
-   - Adult
-   - Senior
+from a facial image using a **multitask ResNet34 model**.
 
-Instead of predicting exact age, the project predicts age groups. This is a more practical approach because exact age prediction is harder, noisier, and more error-prone.
+The project is designed as a complete deep learning workflow:
+
+```text
+Image Dataset → Preprocessing → ResNet34 Training → Evaluation → Grad-CAM Explainability → Streamlit Demo
+```
+
+---
+
+## Problem Statement
+
+Age and gender prediction from images is a common computer vision task.
+
+The goal of this project is not only to train a model, but to create a complete and usable deep learning demo that includes:
+
+* Image upload
+* Preprocessing
+* Prediction
+* Confidence scores
+* Grad-CAM visual explanation
+* Streamlit user interface
+
+---
+
+## Core Workflow
+
+```mermaid
+flowchart LR
+    A[Input Image] --> B[Preprocessing]
+    B --> C[ResNet34 Backbone]
+    C --> D[Gender Classification Head]
+    C --> E[Age Group Classification Head]
+    D --> F[Gender Prediction]
+    E --> G[Age Group Prediction]
+    F --> H[Confidence Scores]
+    G --> H
+    H --> I[Grad-CAM Explanation]
+    I --> J[Streamlit Demo]
+```
 
 ---
 
 ## Key Features
 
-- Image upload through a Streamlit web app
-- Multi-task learning model with one shared ResNet34 backbone
-- Gender and age group prediction from a single image
-- Confidence scores for both predictions
-- Grad-CAM heatmaps for explainability
-- Validation metrics including accuracy, precision, recall, F1-score, and confusion matrix
-- Error analysis for incorrect predictions
-- Unlabeled test image prediction pipeline
-- Modular project structure for training, inference, and deployment
+* Multitask deep learning model
+* ResNet34 backbone
+* Transfer learning
+* Gender classification
+* Age group classification
+* Confidence score output
+* Grad-CAM explainability
+* Image upload interface
+* Local Streamlit demo
+* Clean project structure
 
 ---
 
 ## Tech Stack
 
-- Python
-- PyTorch
-- Torchvision
-- ResNet34
-- Transfer Learning
-- Streamlit
-- Grad-CAM
-- OpenCV
-- PIL
-- Pandas
-- NumPy
-- Matplotlib
-- Scikit-learn
+| Category           | Tools            |
+| ------------------ | ---------------- |
+| Programming        | Python           |
+| Deep Learning      | PyTorch          |
+| Model Architecture | ResNet34         |
+| Computer Vision    | Torchvision, PIL |
+| Data Handling      | NumPy, Pandas    |
+| Visualization      | Matplotlib       |
+| Explainability     | Grad-CAM         |
+| Demo UI            | Streamlit        |
+
+---
+
+## Prediction Targets
+
+### Gender Classes
+
+```text
+Male
+Female
+```
+
+### Age Group Classes
+
+```text
+Child
+Young Adult
+Adult
+Senior
+```
 
 ---
 
 ## Model Architecture
 
-This project uses a **multi-task learning architecture**.
+```mermaid
+flowchart TD
+    A[Input Face Image] --> B[Preprocessing]
+    B --> C[ResNet34 Feature Extractor]
+    C --> D[Shared Feature Vector]
+    D --> E[Gender Head]
+    D --> F[Age Group Head]
+    E --> G[Gender Output]
+    F --> H[Age Group Output]
+```
 
-Input Face Image
-       |
-       v
-Preprocessing
-       |
-       v
-ResNet34 Backbone
-       |
-       v
-Shared Feature Vector
-       |
-       |----------------------|
-       v                      v
-Gender Head              Age Group Head
-Female / Male            Child / Young Adult / Adult / Senior
+The model uses one shared CNN backbone and two task-specific output heads.
 
-The ResNet34 backbone extracts shared visual features from the face image. Two separate classification heads then use these features to predict gender and age group.
---- 
+This approach is useful because the model learns shared visual features and then separates them into two prediction tasks.
 
-## Why Multi-task Learning?
+---
 
-Gender and age group prediction both depend on facial features. Instead of training two separate models, a shared model can learn common visual patterns and use separate output heads for each task.
+## Project Structure
 
-This improves project structure and makes the pipeline more efficient.
-
-## Why Age Groups Instead of Exact Age?
-
-Exact age prediction is difficult because:
-
-people of the same age can look very different
-lighting, pose, and image quality affect predictions
-age labels can be noisy
-exact age is harder to evaluate reliably
-
-Therefore, this project converts exact age into four age groups:
-
-Age Range	Label
-0–12	Child
-13–30	Young Adult
-31–55	Adult
-56+	Senior
-Dataset Structure
-
-The dataset contains training images, test images, and CSV files.
-
-face_dataset/
-│
-├── train/
-│   ├── image_1.jpg
-│   ├── image_2.jpg
-│   └── ...
-│
-├── test/
-│   ├── image_101.jpg
-│   ├── image_102.jpg
-│   └── ...
-│
-├── train.csv
-├── test.csv
-├── train_clean.csv
-├── val_clean.csv
-└── test_clean.csv
-
-The original train.csv contains image paths, age, and gender labels. Since the original test.csv does not contain age or gender labels, the training data was split into:
-
-training set
-validation set
-
-The unlabeled test set is used only for final predictions.
-
-## Data Preprocessing
-
-The preprocessing pipeline includes:
-
-image loading using PIL
-RGB conversion
-resizing to 224 x 224
-data augmentation for training
-ImageNet normalization
-train-validation split
-age-to-age-group conversion
-gender label encoding
-image path validation
-
-## Training transformations:
-
-Resize
-Random Horizontal Flip
-Random Rotation
-Color Jitter
-ToTensor
-ImageNet Normalization
-
-## Validation and inference transformations:
-
-Resize
-ToTensor
-ImageNet Normalization
-
-Random augmentation is not applied during validation or inference.
-
-## Training Pipeline
-
-The training pipeline includes:
-
-Load and clean CSV files
-Validate image paths
-Convert age into age groups
-Encode gender labels
-Create PyTorch Dataset and DataLoader
-Build multi-task ResNet34 model
-Train using two classification losses
-Validate after every epoch
-Save the best model checkpoint
-Plot training and validation performance
-
-The final training loss is calculated as:
-
-total_loss = gender_loss + age_group_loss
-
-Both losses use CrossEntropyLoss.
-
-## Evaluation
-
-The model is evaluated separately for both tasks.
-
-Evaluation metrics:
-
-Accuracy
-Precision
-Recall
-F1-score
-Confusion matrix
-
-The validation set is used for evaluation because the test set does not contain labels.
-
-## Example output format:
-
-Gender Accuracy: 0.XX
-Age Group Accuracy: 0.XX
-Average Validation Score: 0.XX
-
-Add your actual results here:
-
-Task	Accuracy	Precision	Recall	F1-score
-Gender Prediction	XX%	XX%	XX%	XX%
-Age Group Prediction	XX%	XX%	XX%	XX%
-Grad-CAM Explainability
-
-Grad-CAM is used to visualize which regions of the face influenced the model prediction.
-
-The project generates separate Grad-CAM heatmaps for:
-
-gender prediction
-age group prediction
-
-Grad-CAM helps inspect whether the model focuses on relevant facial regions instead of unrelated background areas.
-
-## Important limitation:
-
-Grad-CAM does not prove the model is correct. It only shows which image regions had strong influence on the prediction.
-
-Streamlit Web Demo
-
-The project includes a Streamlit app where users can upload a face image and get:
-
-predicted gender
-gender confidence
-predicted age group
-age group confidence
-gender Grad-CAM heatmap
-age group Grad-CAM heatmap
-
-Run the app using:
-
-streamlit run app.py
-
-or:
-
-python -m streamlit run app.py
-
-## Final Project Structure
-face_dataset/
+```text
+deep-learning-age-gender-prediction/
 │
 ├── app.py
-├── requirements.txt
 ├── README.md
+├── requirements.txt
+├── .gitignore
 │
 ├── model/
 │   ├── model_loader.py
-│   ├── multitask_resnet34.pth
-│   └── __init__.py
+│   └── multitask_resnet34.pth
 │
 ├── src/
 │   ├── preprocessing.py
 │   ├── predict.py
 │   ├── gradcam.py
-│   └── __init__.py
+│   └── utils.py
 │
-├── outputs/
-│   ├── reports/
-│   │   ├── training_history.csv
-│   │   ├── validation_predictions.csv
-│   │   ├── metrics_summary.csv
-│   │   └── test_predictions.csv
-│   │
-│   ├── plots/
-│   └── gradcam_examples/
+├── notebooks/
+│   └── training_notebook.ipynb
 │
-├── sample_images/
+├── assets/
+│   ├── demo.png
+│   ├── prediction_output.png
+│   └── gradcam_output.png
 │
-├── demo_screenshots/
-│
-├── train/
-├── test/
-├── train.csv
-├── test.csv
-├── train_clean.csv
-├── val_clean.csv
-└── test_clean.csv
+└── docs/
+    └── project_notes.md
+```
+
+---
+
+## Example Output
+
+```text
+Input: Uploaded face image
+
+Prediction:
+Gender: Male
+Gender Confidence: 92%
+
+Age Group: Young Adult
+Age Confidence: 84%
+
+Explanation:
+Grad-CAM highlights the facial region used by the model for prediction.
+```
+
+---
+
+## How to Run Locally
+
+### 1. Clone Repository
+
+```bash
+git clone YOUR-DEEP-LEARNING-PROJECT-LINK
+cd deep-learning-age-gender-prediction
+```
+
+### 2. Create Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+### 3. Activate Environment
+
+For Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+For macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Install Requirements
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Run Streamlit App
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## Training Pipeline
+
+```mermaid
+flowchart LR
+    A[Dataset Loading] --> B[Image Preprocessing]
+    B --> C[Train / Validation Split]
+    C --> D[ResNet34 Model]
+    D --> E[Training]
+    E --> F[Validation]
+    F --> G[Metric Tracking]
+    G --> H[Saved Model]
+```
+
+---
+
+## Evaluation
+
+Add your final results here:
+
+| Task                     | Metric   |     Value |
+| ------------------------ | -------- | --------: |
+| Gender Classification    | Accuracy | Add value |
+| Gender Classification    | F1 Score | Add value |
+| Age Group Classification | Accuracy | Add value |
+| Age Group Classification | F1 Score | Add value |
+
+---
+
+## Explainability with Grad-CAM
+
+Grad-CAM is used to visualize the regions of the image that influenced the model prediction.
+
+This helps check:
+
+* Whether the model focuses on the face
+* Whether predictions are based on meaningful image regions
+* Whether the model is affected by background noise
+* Whether wrong predictions have understandable visual causes
+
+---
+
+## What This Project Demonstrates
+
+This project demonstrates:
+
+* Deep learning model development
+* Transfer learning using ResNet34
+* Multitask learning
+* PyTorch training workflow
+* Image preprocessing
+* Model evaluation
+* Explainable AI using Grad-CAM
+* Streamlit demo development
+
+---
+
+## Limitations
+
+* Predictions depend on dataset quality
+* Age group classification can be harder than gender classification
+* Lighting, pose, blur, and occlusion can affect results
+* This is a learning/demo project and not intended for sensitive real-world identity decisions
+
+---
+
+## Future Improvements
+
+* Add better dataset balancing
+* Improve age group classification accuracy
+* Add face detection before classification
+* Add ONNX export
+* Deploy Streamlit app online
+* Add model confidence calibration
+* Add batch image prediction
+
+---
+
+## Recruiter Summary
+
+This project shows a practical deep learning workflow:
+
+```text
+Dataset → Preprocessing → ResNet34 → Multitask Prediction → Evaluation → Grad-CAM → Streamlit Demo
+```
+
+It highlights skills in:
+
+* PyTorch
+* CNNs
+* Transfer learning
+* Multitask learning
+* Explainable AI
+* Streamlit-based AI demos
+
+---
 
 ## Author
-### Naga Sai Satya Sreekar Vanka
-LinkedIn: www.linkedin.com/in/sreekar-v/
-GitHub: https://github.com/Sreekar-1804
+
+**Sreekar**
+
+<p>
+  <a href="mailto:sreekar.germany.2025@gmail.com">
+    <img src="https://img.shields.io/badge/Email-Contact-red?style=for-the-badge&logo=gmail&logoColor=white" />
+  </a>
+  <a href="https://github.com/Sreekar-1804">
+    <img src="https://img.shields.io/badge/GitHub-Sreekar--1804-black?style=for-the-badge&logo=github&logoColor=white" />
+  </a>
+</p>
+
